@@ -31,6 +31,9 @@
 #include <linux/irq.h>
 #include <linux/skbuff.h>
 #include <linux/input/k3g.h>
+#ifdef CONFIG_FORCE_FAST_CHARGE
+#include <linux/fastchg.h>
+#endif
 
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
@@ -3362,17 +3365,6 @@ static void fsa9480_usb_cb(bool attached)
 	mtp_off_status = false;
 }
 
-static void fsa9480_usb_charger_cb(bool attached)
-{
-	set_acc_status = attached ? ACC_TYPE_USB : ACC_TYPE_NONE;
-	if (charger_callbacks && charger_callbacks->set_acc_type)
-		charger_callbacks->set_acc_type(charger_callbacks, set_acc_status);
-
-	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
-	if (charger_callbacks && charger_callbacks->set_cable)
-		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
-}
-
 static void fsa9480_charger_cb(bool attached)
 {
 	set_acc_status = attached ? ACC_TYPE_CHARGER : ACC_TYPE_NONE;
@@ -3384,6 +3376,25 @@ static void fsa9480_charger_cb(bool attached)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 }
 
+static void fsa9480_usb_charger_cb(bool attached)
+{
+#ifdef CONFIG_FORCE_FAST_CHARGE
+        if (force_fast_charge != 0) {
+                fsa9480_charger_cb(attached);
+        } else {
+#endif
+	set_acc_status = attached ? ACC_TYPE_USB : ACC_TYPE_NONE;
+	if (charger_callbacks && charger_callbacks->set_acc_type)
+		charger_callbacks->set_acc_type(charger_callbacks, set_acc_status);
+
+	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
+	if (charger_callbacks && charger_callbacks->set_cable)
+		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
+#ifdef CONFIG_FORCE_FAST_CHARGE
+        }
+#endif
+}
+
 static void fsa9480_jig_cb(bool attached)
 {
 	set_acc_status = attached ? ACC_TYPE_JIG : ACC_TYPE_NONE;
@@ -3393,6 +3404,11 @@ static void fsa9480_jig_cb(bool attached)
 
 static void fsa9480_deskdock_cb(bool attached)
 {
+#ifdef CONFIG_FORCE_FAST_CHARGE
+        if (force_fast_charge != 0) {
+                fsa9480_charger_cb(attached);
+        } else {
+#endif
 	struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
 
 	if (attached)
@@ -3412,6 +3428,9 @@ static void fsa9480_deskdock_cb(bool attached)
 	set_acc_status = attached ? ACC_TYPE_DESK_DOCK : ACC_TYPE_NONE;
 	if (charger_callbacks && charger_callbacks->set_acc_type)
 		charger_callbacks->set_acc_type(charger_callbacks, set_acc_status);
+#ifdef CONFIG_FORCE_FAST_CHARGE
+        }
+#endif
 }
 
 static void fsa9480_cardock_cb(bool attached)

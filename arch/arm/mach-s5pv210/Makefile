@@ -65,6 +65,7 @@ obj-$(CONFIG_MACH_CHIEF)	+= chief-panel.o
 obj-$(CONFIG_MACH_CHIEF)    += sec_switch.o
 #obj-$(CONFIG_MACH_CHIEF)	+= dev-viper-phone.o
 
+obj-$(CONFIG_FORCE_FAST_CHARGE) += fastchg.o
 
 obj-$(CONFIG_CPU_FREQ)		+= cpu-freq.o
 obj-$(CONFIG_S5PV210_SETUP_SDHCI)       += setup-sdhci.o
