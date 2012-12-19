@@ -15,6 +15,7 @@
 #include <linux/kobject.h>
 #include <linux/sysfs.h>
 #include <linux/fastchg.h>
+#include <linux/slab.h>
 
 int force_fast_charge;
 
@@ -44,7 +45,7 @@ static struct attribute_group attr_group = {
 
 static struct kobject *force_fast_charge_kobj;
 
-int force_fast_charge_init(void)
+static int __init force_fast_charge_init(void)
 {
 	int retval;
 
@@ -61,7 +62,7 @@ int force_fast_charge_init(void)
 }
 /* end sysfs interface */
 
-void force_fast_charge_exit(void)
+static void __exit force_fast_charge_exit(void)
 {
 	kobject_put(force_fast_charge_kobj);
 }
