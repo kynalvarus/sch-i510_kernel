@@ -57,6 +57,7 @@ extern int sipc_do_cmd(struct sipc *, struct sk_buff *skb);
 
 extern ssize_t sipc_debug_show(struct sipc *, char *);
 extern int sipc_debug(struct sipc *, const char *);
+extern int sipc_whitelist(struct sipc *si, const char *buf, size_t count);
 
 extern void sipc_ramdump(struct sipc *);
 

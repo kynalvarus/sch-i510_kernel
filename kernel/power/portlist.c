@@ -5,8 +5,8 @@
 #include <linux/fs.h>
 #include <linux/slab.h>
 
-#undef DEBUG_PORT_INFO
-//#define DEBUG_PORT_INFO
+//#undef DEBUG_PORT_INFO
+#define DEBUG_PORT_INFO
 
 #ifdef DEBUG_PORT_INFO
 #define dprintk		printk

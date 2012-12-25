@@ -2959,6 +2959,32 @@ int sipc_debug(struct sipc *si, const char *buf)
 	return 0;
 }
 
+int sipc_whitelist(struct sipc *si, const char *buf, size_t count)
+{
+	int r;
+	struct ringbuf *rb;
+
+	printk("[%s]\n",__func__);
+
+	if (!si || !buf)
+		return -EINVAL;
+
+	r = _get_auth();
+	if (r)
+		return r;
+
+	rb = (struct ringbuf *)&si->rb[IPCIDX_FMT];
+
+	//write direct full-established-packet to buf
+	r =  __write(rb,(u8 *) buf, (unsigned int )count);
+
+	_req_rel_auth(si);
+	_put_auth(si, 0);
+
+	onedram_write_mailbox(MB_DATA(mb_data[IPCIDX_FMT].mask_send));
+	return r;
+}
+
 int sipc_check_skb(struct sipc *si, struct sk_buff *skb)
 {
 	struct phonethdr *ph;
